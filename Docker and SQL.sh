@@ -63,7 +63,7 @@ fi
 
 clear
 
-if [ "$YesORNoD" == "Yes" ]
+if [ "$YesORNoD" == "Yes" ]; then
     sudo apt-get update
 
     # Add Docker’s official GPG key
