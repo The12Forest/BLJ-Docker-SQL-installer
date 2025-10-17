@@ -38,6 +38,15 @@ if [ "$YesORNoS" == "Yes" ]; then
   echo You are in the Password Stage!
   echo
   while true; do
+    read -p "Please enter the chosen Servername for the SQL Server: " profilenm
+    if [ -n "$profilenm" ]; then
+      break
+    else
+      echo "Servername must contain something!"
+    fi
+  done
+
+  while true; do
     read -p "Now you have to set a Password for the SQL Server:     " passwd
     read -p "Please retype the password:                            " passwd2
     if [ "$passwd" != "$passwd2" ]; then
@@ -99,7 +108,7 @@ if [ "$YesORNoS" == "Yes" ]; then
   sudo chmod -R 777 ~/BLJ-SQL
 
   sudo docker run -d \
-    --name sqlserver \
+    --name $profilenm \
     --restart unless-stopped \
     --network host \
     -e "ACCEPT_EULA=Y" \
@@ -117,16 +126,22 @@ if [ "$YesORNoS" == "Yes" ]; then
 
   clear
 
-  echo Der SQL Server ist erfolgreich installier!
-  echo Nun kannst du dich darauf verbinden.
-  echo
-  echo Die Anmeldedaten sind:
-  echo "  Address:    \"$ipaddr, 1433\""
-  echo "  User:       \"sa\""
-  echo "  Passwd:     \"$passwd\""
-  echo
-  echo
-  echo "PS: Der Server läuft nicht sollange kein WSL Fenster offen ist. (Es darf auch im Hintergrund sein.)"
+    echo "Docker and the SQL Server has been successfully installed!"
+    echo "Now you can connect to it, in most cases using Visual Studio Code."
+    echo "Anything not defined here should be left at the default."
+    echo
+    echo "The login credentials are:"
+    echo "   Profile Name:            \"$profilenm\""
+    echo "   Trust server certificate: True"
+    echo "   Server name:             \"$ipaddr, 1433\""
+    echo "   Username:                \"sa\""
+    echo "   Password:                \"$passwd\""
+    echo "   Save Password:           True"
+    echo
+    echo
+    echo "PS: The server will not run unless a WSL window is open (it can also be in the background)."
+    echo "And the server profile does not need to match."
 else
-    echo Docker wurde erfolgreich installiert!
+    clear
+    echo "Docker was successfully installed!"
 fi
