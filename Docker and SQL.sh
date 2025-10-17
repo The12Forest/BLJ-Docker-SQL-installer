@@ -28,15 +28,7 @@ while true; do
     fi
 done
 
-is_valid_sql_passwd() {
-  pw="$1"
-  [ "${#pw}" -ge 8 ] && [ "${#pw}" -le 128 ] || return 1
-  echo "$pw" | grep -q '[A-Z]' || return 1
-  echo "$pw" | grep -q '[a-z]' || return 1
-  echo "$pw" | grep -q '[0-9]' || return 1
-  echo "$pw" | grep -q '[^A-Za-z0-9]' || return 1
-  return 0
-}
+
 
 if [ "$YesORNoS" == "Yes" ]; then
   clear
@@ -51,11 +43,18 @@ if [ "$YesORNoS" == "Yes" ]; then
         echo "Passwords do not match."
         continue
     fi
-    if ! is_valid_sql_passwd "$passwd"; then
-        echo "Invalid password. Must be 8–128 chars with upper, lower, number, and symbol."
-        continue
+    
+    if [ "$passwd" = "$passwd2" ] && \
+        [ "${#passwd}" -ge 8 ] && [ "${#passwd}" -le 128 ] && \
+        echo "$passwd" | grep -q '[A-Z]' && \
+        echo "$passwd" | grep -q '[a-z]' && \
+        echo "$passwd" | grep -q '[0-9]' && \
+        echo "$passwd" | grep -q '[^A-Za-z0-9]'
+    then
+        break
     fi
-    break
+
+    echo "Invalid password. Must match and have 8–128 chars with upper, lower, number, and symbol."
     done
 fi
 
