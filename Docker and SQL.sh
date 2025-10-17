@@ -28,6 +28,16 @@ while true; do
     fi
 done
 
+is_valid_sql_passwd() {
+  pw="$1"
+  [ "${#pw}" -ge 8 ] && [ "${#pw}" -le 128 ] || return 1
+  echo "$pw" | grep -q '[A-Z]' || return 1
+  echo "$pw" | grep -q '[a-z]' || return 1
+  echo "$pw" | grep -q '[0-9]' || return 1
+  echo "$pw" | grep -q '[^A-Za-z0-9]' || return 1
+  return 0
+}
+
 if [ "$YesORNoS" == "Yes" ]; then
   clear
   echo Now you are in the Password Stage!
@@ -49,16 +59,6 @@ if [ "$YesORNoS" == "Yes" ]; then
     done
 fi
 
-
-is_valid_sql_passwd() {
-  pw="$1"
-  [ "${#pw}" -ge 8 ] && [ "${#pw}" -le 128 ] || return 1
-  echo "$pw" | grep -q '[A-Z]' || return 1
-  echo "$pw" | grep -q '[a-z]' || return 1
-  echo "$pw" | grep -q '[0-9]' || return 1
-  echo "$pw" | grep -q '[^A-Za-z0-9]' || return 1
-  return 0
-}
 
 echo "Password accepted."
 sleep 1.5
