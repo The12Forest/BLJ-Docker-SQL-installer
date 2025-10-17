@@ -127,4 +127,6 @@ if [ "$YesORNoS" == "Yes" ]; then
   echo
   echo
   echo "PS: Der Server läuft nicht sollange kein WSL Fenster offen ist. (Es darf auch im Hintergrund sein.)"
+else
+    echo Docker wurde erfolgreich installiert!
 fi
