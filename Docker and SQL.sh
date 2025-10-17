@@ -9,7 +9,7 @@ fi
 clear
 while true; do
     read -p "Do you want to install Docker:                     " YesORNoD
-    if [[ "$YesORNo" =~ ^(Yes|No)$ ]]; then
+    if [[ "$YesORNoD" =~ ^(Yes|No)$ ]]; then
         break
     else
         echo "Invalid input. Please enter 'Yes' or 'No'."
@@ -21,7 +21,7 @@ if [ "$YesORNoD" == "No" ]; then
 fi
 while true; do
     read -p "Do you want to install an SQL Server on Docker:    " YesORNoS
-    if [[ "$YesORNo" =~ ^(Yes|No)$ ]]; then
+    if [[ "$YesORNoS" =~ ^(Yes|No)$ ]]; then
         break
     else
         echo "Invalid input. Please enter 'Yes' or 'No'."
