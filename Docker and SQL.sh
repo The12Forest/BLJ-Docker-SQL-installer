@@ -33,18 +33,37 @@ if [ "$YesORNoS" == "Yes" ]; then
   echo Now you are in the Password Stage!
   echo
   while true; do
-    read -p "Now you have to set a Password for the SQL Server: " passwd
+    read -p "Now you have to set a Password for the SQL Server:     " passwd
     echo
-    read -p "Please retype the password: " passwd2
+    read -p "Please retype the password:                            " passwd2
     echo
-  if [ "$passwd" = "$passwd2" ] && [ -n "$passwd" ]; then
+    if [ "$passwd" != "$passwd2" ]; then
+        echo "Passwords do not match."
+        continue
+    fi
+    if ! is_valid_sql_passwd "$passwd"; then
+        echo "Invalid password. Must be 8–128 chars with upper, lower, number, and symbol."
+        continue
+    fi
     break
-  fi
-  echo "Passwords do not match or empty. Try again."
-done
-  clear
+    done
 fi
 
+
+is_valid_sql_passwd() {
+  pw="$1"
+  [ "${#pw}" -ge 8 ] && [ "${#pw}" -le 128 ] || return 1
+  echo "$pw" | grep -q '[A-Z]' || return 1
+  echo "$pw" | grep -q '[a-z]' || return 1
+  echo "$pw" | grep -q '[0-9]' || return 1
+  echo "$pw" | grep -q '[^A-Za-z0-9]' || return 1
+  return 0
+}
+
+echo "Password accepted."
+sleep 1.5
+
+clear
 
 sudo apt-get update
 
@@ -107,7 +126,7 @@ if [ "$YesORNoS" == "Yes" ]; then
   echo Die Anmeldedaten sind:
   echo "  Address:    $ipaddr, 1443"
   echo "  User:       sa"
-  echo "  Passwd:     $password"
+  echo "  Passwd:     $passwd"
   echo
   echo
   echo PS: Wenn du deinen PC neustartest wird der Server gestoppt, um ihn wider zu starten öffne einfach kurtz WSL.
