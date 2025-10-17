@@ -28,14 +28,14 @@ while true; do
     fi
 done
 
-if [ "$YesORNoS" == "No" ]; then
+if [ "$YesORNoS" == "Yes" ]; then
   clear
   echo Now you are in the Password Stage!
   echo
   while true; do
-    read -s -p "Now you have to set a Password for the SQL Server: " passwd
+    read -p "Now you have to set a Password for the SQL Server: " passwd
     echo
-    read -s -p "Please retype the password: " passwd2
+    read -p "Please retype the password: " passwd2
     echo
   if [ "$passwd" = "$passwd2" ] && [ -n "$passwd" ]; then
     break
@@ -70,7 +70,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 sudo usermod -aG docker $USER
 
 
-if [ "$YesORNoS" == "No" ]; then
+if [ "$YesORNoS" == "Yes" ]; then
   clear
   echo Starting Container
 
@@ -85,7 +85,7 @@ if [ "$YesORNoS" == "No" ]; then
     --restart unless-stopped \
     --network host \
     -e "ACCEPT_EULA=Y" \
-    -e "MSSQL_SA_PASSWORD=Admin@123" \
+    -e "MSSQL_SA_PASSWORD=$passwd" \
     -e "MSSQL_PID=Express" \
     -v ~/BLJ-SQL:/var/opt/mssql \
     --health-cmd '/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Admin@123" -Q "SELECT 1" || exit 1' \
@@ -101,7 +101,7 @@ if [ "$YesORNoS" == "No" ]; then
 
   clear
 
-  echo      Der SQL Server ist erfolgreich installier!
+  echo Der SQL Server ist erfolgreich installier!
   echo Nun kannst du dich darauf verbinden.
   echo
   echo Die Anmeldedaten sind:
@@ -111,5 +111,4 @@ if [ "$YesORNoS" == "No" ]; then
   echo
   echo
   echo PS: Wenn du deinen PC neustartest wird der Server gestoppt, um ihn wider zu starten öffne einfach kurtz WSL.
-
 fi
