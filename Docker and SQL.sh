@@ -8,7 +8,7 @@ fi
 
 clear
 while true; do
-    read -p "Do you want to install Docker:                     " YesORNoD
+    read -p "Do you want to install Docker (Yes or No):                     " YesORNoD
     if [[ "$YesORNoD" =~ ^(Yes|No)$ ]]; then
         break
     else
@@ -16,11 +16,14 @@ while true; do
     fi
 done
 if [ "$YesORNoD" == "No" ]; then
-  clear
-  exit 1
+    if ! command -v docker >/dev/null 2>&1; then
+    clear
+    echo "Docker is not installed. Please install Docker first." >&2
+    exit 1
+    fi
 fi
 while true; do
-    read -p "Do you want to install an SQL Server on Docker:    " YesORNoS
+    read -p "Do you want to install an SQL Server on Docker (Yes or No):    " YesORNoS
     if [[ "$YesORNoS" =~ ^(Yes|No)$ ]]; then
         break
     else
@@ -32,13 +35,11 @@ done
 
 if [ "$YesORNoS" == "Yes" ]; then
   clear
-  echo Now you are in the Password Stage!
+  echo You are in the Password Stage!
   echo
   while true; do
     read -p "Now you have to set a Password for the SQL Server:     " passwd
-    echo
     read -p "Please retype the password:                            " passwd2
-    echo
     if [ "$passwd" != "$passwd2" ]; then
         echo "Passwords do not match."
         continue
@@ -56,37 +57,36 @@ if [ "$YesORNoS" == "Yes" ]; then
 
     echo "Invalid password. Must match and have 8–128 chars with upper, lower, number, and symbol."
     done
+    echo "Password accepted..."
+    sleep 1.5
 fi
-
-
-echo "Password accepted."
-sleep 1.5
 
 clear
 
-sudo apt-get update
+if [ "$YesORNoD" == "Yes" ]
+    sudo apt-get update
 
-# Add Docker’s official GPG key
-sudo apt-get install ca-certificates curl gnupg -y
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    # Add Docker’s official GPG key
+    sudo apt-get install ca-certificates curl gnupg -y
+    sudo install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
-# Add Docker’s official Ubuntu repo
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
-  https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    # Add Docker’s official Ubuntu repo
+    echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+    https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Update package index
-sudo apt-get update
+    # Update package index
+    sudo apt-get update
 
 
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
-sudo usermod -aG docker $USER
-
+    sudo usermod -aG docker $USER
+fi
 
 if [ "$YesORNoS" == "Yes" ]; then
   clear
@@ -105,8 +105,8 @@ if [ "$YesORNoS" == "Yes" ]; then
     -e "ACCEPT_EULA=Y" \
     -e "MSSQL_SA_PASSWORD=$passwd" \
     -e "MSSQL_PID=Express" \
-    -v ~/BLJ-SQL:/var/opt/mssql \
-    --health-cmd '/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Admin@123" -Q "SELECT 1" || exit 1' \
+    -v "$HOME/BLJ-SQL:/var/opt/mssql" \
+    --health-cmd '/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \$MSSQL_SA_PASSWORD -Q "SELECT 1" || exit 1' \
     --health-interval=10s \
     --health-timeout=3s \
     --health-retries=10 \
@@ -121,10 +121,10 @@ if [ "$YesORNoS" == "Yes" ]; then
   echo Nun kannst du dich darauf verbinden.
   echo
   echo Die Anmeldedaten sind:
-  echo "  Address:    $ipaddr, 1443"
-  echo "  User:       sa"
-  echo "  Passwd:     $passwd"
+  echo "  Address:    \"$ipaddr, 1433\""
+  echo "  User:       \"sa\""
+  echo "  Passwd:     \"$passwd\""
   echo
   echo
-  echo PS: Wenn du deinen PC neustartest wird der Server gestoppt, um ihn wider zu starten öffne einfach kurtz WSL.
+  echo "PS: Der Server läuft nicht sollange kein WSL Fenster offen ist. (Es darf auch im Hintergrund sein.)"
 fi
