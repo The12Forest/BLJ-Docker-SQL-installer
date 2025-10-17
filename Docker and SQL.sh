@@ -90,7 +90,7 @@ sudo usermod -aG docker $USER
 
 if [ "$YesORNoS" == "Yes" ]; then
   clear
-  echo Starting Container
+  echo Starting Container...
 
   cd ~
 
@@ -112,8 +112,6 @@ if [ "$YesORNoS" == "Yes" ]; then
     --health-retries=10 \
     --health-start-period=10s \
     mcr.microsoft.com/mssql/server:2022-latest
-
-  sudo docker ps
 
   ipaddr=$(ip -4 addr show eth0 | awk '/inet /{print $2}' | cut -d/ -f1)
 
